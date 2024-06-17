@@ -6,14 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let particles = [];
     let blackHoleMass = 40;
     let gravityScale = 1;
+    let particleSize = 4;
+    let trailLength = 50;
+    let backgroundColor = '#1c1c1c';
 
     function adjustCanvasSize() {
-        canvas.width = window.innerWidth * 0.8;
-        canvas.height = window.innerHeight * 0.8;
+        canvas.width = window.innerWidth * 0.6;
+        canvas.height = window.innerHeight * 0.6;
     }
 
     function drawParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         for (const particle of particles) {
             ctx.beginPath();
@@ -42,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             particle.x += particle.vx * 0.003;
             particle.y += particle.vy * 0.003;
             particle.trail.push({ x: particle.x, y: particle.y });
-            if (particle.trail.length > 50) {
+            if (particle.trail.length > trailLength) {
                 particle.trail.shift();
             }
         }
@@ -56,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = Math.random() * canvas.height;
             const vx = (Math.random() - 0.5) * 20;
             const vy = (Math.random() - 0.5) * 20;
-            const radius = Math.random() * 5 + 2;
+            const radius = parseInt(document.getElementById('particleSize').value);
             const color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
             particles.push({ x, y, vx, vy, radius, color, trail: [] });
         }
@@ -92,6 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('gravityScale').addEventListener('input', () => {
         gravityScale = parseFloat(document.getElementById('gravityScale').value);
+    });
+    document.getElementById('particleSize').addEventListener('input', () => {
+        particleSize = parseInt(document.getElementById('particleSize').value);
+    });
+    document.getElementById('trailLength').addEventListener('change', () => {
+        trailLength = parseInt(document.getElementById('trailLength').value);
+    });
+    document.getElementById('backgroundColor').addEventListener('input', () => {
+        backgroundColor = document.getElementById('backgroundColor').value;
     });
     window.addEventListener('resize', adjustCanvasSize);
 });

@@ -18,6 +18,8 @@ Drawing on concepts from physics and astronomy, this project aims to visualize h
   - Black hole mass
   - Gravity scale
 
+ ![Screenshot of the app](bhps-screenshot.png)
+
 ## Acknowledgments
 
 - Original inspiration and initial code base from [JoeSzeles/Black-Hole--Planetary-System-Simulator--QI:main](https://github.com/JoeSzeles/Black-Hole--Planetary-System-Simulator--QI)
