@@ -13,6 +13,14 @@
         <div class="controls">
             <button id="startButton">Start</button>
             <button id="stopButton">Stop</button>
+            <div class="settings">
+                <label for="particleCount">Particle Count:</label>
+                <input type="number" id="particleCount" value="200" min="50" max="500">
+                <label for="blackHoleMass">Black Hole Mass:</label>
+                <input type="number" id="blackHoleMass" value="40" min="10" max="100">
+                <label for="gravityScale">Gravity Scale:</label>
+                <input type="range" id="gravityScale" value="1" min="0.1" max="2" step="0.1">
+            </div>
         </div>
     </div>
 

@@ -3,13 +3,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let isSimulationRunning = false;
+    let particles = [];
+    let blackHoleMass = 40;
+    let gravityScale = 1;
 
     function adjustCanvasSize() {
         canvas.width = window.innerWidth * 0.8;
         canvas.height = window.innerHeight * 0.8;
     }
 
-    function drawParticles(particles) {
+    function drawParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         for (const particle of particles) {
@@ -28,12 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateParticles(particles, blackHoleX, blackHoleY) {
+    function updateParticles() {
         for (const particle of particles) {
-            const dx = blackHoleX - particle.x;
-            const dy = blackHoleY - particle.y;
+            const dx = canvas.width / 2 - particle.x;
+            const dy = canvas.height / 2 - particle.y;
             const r = Math.sqrt(dx ** 2 + dy ** 2);
-            const a = (6.67430e-11 * 40 * 10 ** 15) / (r ** 2);
+            const a = (6.67430e-11 * blackHoleMass * 10 ** 15) / (r ** 2) * gravityScale;
             particle.vx += a * dx / r * 0.003;
             particle.vy += a * dy / r * 0.003;
             particle.x += particle.vx * 0.003;
@@ -47,8 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initializeSimulation() {
         adjustCanvasSize();
-        const particles = [];
-        for (let i = 0; i < 200; i++) {
+        particles = [];
+        for (let i = 0; i < parseInt(document.getElementById('particleCount').value); i++) {
             const x = Math.random() * canvas.width;
             const y = Math.random() * canvas.height;
             const vx = (Math.random() - 0.5) * 20;
@@ -59,18 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function animateSimulation() {
-            updateParticles(particles, canvas.width / 2, canvas.height / 2);
-            drawParticles(particles);
+            updateParticles();
+            drawParticles();
             animationFrameId = requestAnimationFrame(animateSimulation);
         }
 
         animateSimulation();
-        return particles;
     }
 
     function startSimulation() {
         if (!isSimulationRunning) {
-            particles = initializeSimulation();
+            initializeSimulation();
             isSimulationRunning = true;
         }
     }
@@ -84,5 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('startButton').addEventListener('click', startSimulation);
     document.getElementById('stopButton').addEventListener('click', stopSimulation);
+    document.getElementById('particleCount').addEventListener('change', initializeSimulation);
+    document.getElementById('blackHoleMass').addEventListener('change', () => {
+        blackHoleMass = parseInt(document.getElementById('blackHoleMass').value);
+    });
+    document.getElementById('gravityScale').addEventListener('input', () => {
+        gravityScale = parseFloat(document.getElementById('gravityScale').value);
+    });
     window.addEventListener('resize', adjustCanvasSize);
 });
