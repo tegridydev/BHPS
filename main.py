@@ -14,7 +14,6 @@ class ParticleSimulation:
         self.PARTICLE_COUNT = 200
 
     def initialize_particles(self):
-        """Initialize particles with random positions, velocities, and masses."""
         particles = []
         for _ in range(self.PARTICLE_COUNT):
             pradius = random.uniform(2, 8)
@@ -32,7 +31,6 @@ class ParticleSimulation:
         return particles
 
     def update_particle(self, particle, black_hole_x, black_hole_y):
-        """Update the position and velocity of a particle."""
         dx = black_hole_x - particle["x"]
         dy = black_hole_y - particle["y"]
         r = math.sqrt(dx**2 + dy**2)
@@ -44,26 +42,22 @@ class ParticleSimulation:
         particle["trail"].append((particle["x"], particle["y"]))
 
     def run_simulation(self):
-        """Run the simulation and return the screen as an image."""
         particles = self.initialize_particles()
         black_hole_x, black_hole_y = self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2
 
-        for _ in range(60):  # Run the simulation for 60 frames
+        for _ in range(60):
             for particle in particles:
                 self.update_particle(particle, black_hole_x, black_hole_y)
         
-        # Create an in-memory image
         image = Image.new('RGB', (self.SCREEN_WIDTH, self.SCREEN_HEIGHT), (0, 0, 0))
         draw = ImageDraw.Draw(image)
 
-        # Draw particles on the image
         for particle in particles:
             color = particle["color"]
             position = (int(particle["x"]), int(particle["y"]))
             radius = int(particle["radius"])
             draw.ellipse((position[0] - radius, position[1] - radius, position[0] + radius, position[1] + radius), fill=color)
 
-        # Save image to BytesIO object
         image_bytes = BytesIO()
         image.save(image_bytes, format='PNG')
         image_bytes.seek(0)

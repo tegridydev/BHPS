@@ -14,6 +14,7 @@ black_hole_pos = (900, 500)
 black_hole_radius = 40
 black_hole_mass = 1.989 * 10**7
 event_horizon_radius = 2 * black_hole_radius
+
 # Define the photons
 photons = []
 for i in range(200):
@@ -38,9 +39,8 @@ while running:
     screen.fill((0, 0, 0))
 
     # Draw the black hole
-    
-
-
+    pygame.draw.circle(screen, (0, 0, 0), black_hole_pos, event_horizon_radius, 0) 
+    pygame.draw.circle(screen, (0, 0, 0), black_hole_pos, black_hole_radius, 1) 
 
     # Update the photons
     for photon in photons:
@@ -53,39 +53,26 @@ while running:
             photon["color"] = (234, 180, 80)
         else:
             # The photon is outside the event horizon and will continue to move under the influence of gravity
-            # Calculate the gravitational force acting on the photon
             force = G * black_hole_mass / distance**2
-
-            # Calculate the direction of the force
             force_direction = math.atan2(black_hole_pos[1] - photon["pos"][1], black_hole_pos[0] - photon["pos"][0])
 
-        # Update the velocity of the photon
-        scaling_factor = 0.1 # this is the new scaling factor
-        photon["velocity"] = (photon["velocity"][0] + scaling_factor * force * math.cos(force_direction), photon["velocity"][1] + scaling_factor * force * math.sin(force_direction))
+            # Update the velocity of the photon
+            scaling_factor = 0.1
+            photon["velocity"] = (photon["velocity"][0] + scaling_factor * force * math.cos(force_direction), photon["velocity"][1] + scaling_factor * force * math.sin(force_direction))
 
-        # Update the position of the photon
-        photon["pos"] = (photon["pos"][0] + photon["velocity"][0], photon["pos"][1] + photon["velocity"][1])
+            # Update the position of the photon
+            photon["pos"] = (photon["pos"][0] + photon["velocity"][0], photon["pos"][1] + photon["velocity"][1])
 
-        # Add the current position to the trail
-        photon["trail"].append(photon["pos"])
+            # Add the current position to the trail
+            photon["trail"].append(photon["pos"])
 
-        # Draw the photon
-        pygame.draw.circle(screen, photon["color"], (int(photon["pos"][0]), int(photon["pos"][1])), 2)
+            # Draw the photon
+            pygame.draw.circle(screen, photon["color"], (int(photon["pos"][0]), int(photon["pos"][1])), 2)
 
-        # Draw the trail
-        dash_length = 1 
-        gap_length = 1
-        for i in range(1, len(photon["trail"])):
-            if i % (dash_length + gap_length) < dash_length:
-               # pygame.draw.line(screen, photon["color"], photon["trail"][i-1], photon["trail"][i], 1, pygame.style.DASHED)
+            # Draw the trail
+            for i in range(1, len(photon["trail"])):
                 pygame.draw.aaline(screen, photon["color"], photon["trail"][i-1], photon["trail"][i])
-            
-        # Draw black hole
-            # Draw the event horizon
-            
-      
-    pygame.draw.circle(screen, (0, 0, 0), black_hole_pos, event_horizon_radius, 0) 
-    pygame.draw.circle(screen, (0, 0, 0), black_hole_pos, black_hole_radius, 1) 
+
     # Update the screen
     pygame.display.update()
 
