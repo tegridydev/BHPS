@@ -1,12 +1,21 @@
+# Black Hole Particle Simulation (BHPS)
 
-This is a simulation of a black hole and particles representing stars moving around it. It uses Pygame to display the simulation on a window of size WINDOW_SIZE = (1800, 1000).
+BHPS aims to simulate a particle system interacting with a central black hole using Python and PIL (Python Imaging Library).
 
-The simulation uses the formula for gravitational force to calculate the acceleration of each particle due to other particles and the black hole. The velocity and position of each particle are then updated based on the acceleration.
+## Inspo
 
-The simulation also stores the positions of each particle over time and draws a line to show the particle's trajectory. The black hole is represented as a circle with a chosen radius in the center of the screen. The particles representing stars are also drawn as circles with a random radius.
+This repository is a fork inspired by [JoeSzeles/Black-Hole--Planetary-System-Simulator--QI:main](https://github.com/JoeSzeles/Black-Hole--Planetary-System-Simulator--QI).
 
-The simulation runs in a loop until the user closes the Pygame window.
+The inspiration behind this particle simulation with a black hole comes from exploring the dynamics of gravitational interactions in a simulated environment. 
 
-it uses following modules:import, random, math
+Drawing on concepts from physics and astronomy, this project aims to visualize how particles behave under the influence of a massive central object, akin to a black hole.
 
-Pressing Space bar will delete the projected trajectories, and start drawing them again fresh
+## Details
+
+The simulation initializes a number of particles with random positions, velocities, and masses. These particles interact gravitationally with a central black hole based on Newtonian mechanics. The simulation runs for a fixed number of frames, updating particle positions and velocities accordingly. The resulting particle movements are visualized on a canvas and saved as an image.
+
+## Acknowledgments
+
+- Original inspiration and initial code base from [JoeSzeles/Black-Hole--Planetary-System-Simulator--QI:main](https://github.com/JoeSzeles/Black-Hole--Planetary-System-Simulator--QI).
+
+
