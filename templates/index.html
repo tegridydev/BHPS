@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        canvas {
+            display: block; /* Ensure canvas stretches to fill its container */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="simulationCanvas"></canvas>
+
+    <!-- Adjust simulation parameters -->
+    <div>
+        <label for="particleCount">Particle Count:</label>
+        <input type="number" id="particleCount" value="100" min="1" max="500">
+    </div>
+    <div>
+        <label for="velocityMin">Velocity Min:</label>
+        <input type="number" id="velocityMin" value="-1">
+    </div>
+    <div>
+        <label for="velocityMax">Velocity Max:</label>
+        <input type="number" id="velocityMax" value="1">
+    </div>
+
+    <!-- Initialize simulation -->
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize simulation
+            initializeSimulation();
+
+            // Update parameters on input change
+            const particleCountInput = document.getElementById('particleCount');
+            const velocityMinInput = document.getElementById('velocityMin');
+            const velocityMaxInput = document.getElementById('velocityMax');
+
+            particleCountInput.addEventListener('change', () => {
+                updateParameters(parseInt(particleCountInput.value), parseFloat(velocityMinInput.value), parseFloat(velocityMaxInput.value));
+            });
+
+            velocityMinInput.addEventListener('change', () => {
+                updateParameters(parseInt(particleCountInput.value), parseFloat(velocityMinInput.value), parseFloat(velocityMaxInput.value));
+            });
+
+            velocityMaxInput.addEventListener('change', () => {
+                updateParameters(parseInt(particleCountInput.value), parseFloat(velocityMinInput.value), parseFloat(velocityMaxInput.value));
+            });
+        });
+    </script>
+</body>
+</html>

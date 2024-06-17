@@ -1,213 +1,88 @@
+import os
 import pygame
 import random
 import math
 import numpy as np
-scalefactor = 10000
-c = 299792458 # speed of light
-G = 6.67430e-11 # gravitational constant
-Theta =8.8*10**26
-WINDOW_SIZE = (1800, 1000)
-DT = 0.003  # time step in seconds
-particle_amount=200
-black_hole_mass = 40*10**15
-black_hole_radius=25
-colors = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for i in range(particle_amount)]
+from typing import List, Dict, Tuple
 
-# Initialize Pygame
-pygame.init()
+# Constants
+SCREEN_WIDTH = 1800
+SCREEN_HEIGHT = 1000
+BLACK_HOLE_MASS = 40 * 10**15
+BLACK_HOLE_RADIUS = 25
+GRAVITATIONAL_CONSTANT = 6.67430e-11
+SPEED_OF_LIGHT = 299792458
+THETA = 8.8 * 10**26
+SCALE_FACTOR = 10000
+TIME_STEP = 0.003
+PARTICLE_COUNT = 200
 
-# Set the display
-screen = pygame.display.set_mode(WINDOW_SIZE)
+def initialize_particles() -> List[Dict[str, float]]:
+    """Initialize particles with random positions, velocities, and masses."""
+    particles = []
+    for _ in range(PARTICLE_COUNT):
+        pradius = random.uniform(2, 8)
+        mass = random.uniform(2 * 10**8, 4 * 10**15)
+        particles.append({
+            "x": random.randint(0, SCREEN_WIDTH),
+            "y": random.randint(0, SCREEN_HEIGHT),
+            "vx": random.uniform(-10, 10),
+            "vy": random.uniform(-10, 10),
+            "mass": mass,
+            "radius": pradius,
+            "color": (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
+            "trail": []
+        })
+    return particles
 
-# Set the background color
-screen.fill((0, 0, 0))
+def update_particle(particle: Dict[str, float], black_hole_x: float, black_hole_y: float) -> None:
+    """Update the position and velocity of a particle."""
+    dx = black_hole_x - particle["x"]
+    dy = black_hole_y - particle["y"]
+    r = math.sqrt(dx**2 + dy**2)
+    a = GRAVITATIONAL_CONSTANT * BLACK_HOLE_MASS / r**2
+    particle["vx"] += a * dx / r * TIME_STEP
+    particle["vy"] += a * dy / r * TIME_STEP
+    particle["x"] += particle["vx"] * TIME_STEP / SCALE_FACTOR
+    particle["y"] += particle["vy"] * TIME_STEP / SCALE_FACTOR
+    particle["trail"].append((particle["x"], particle["y"]))
 
-# List to store particles representing the stars
-particles = []
-black_holes=[]
+def draw_particle(screen: pygame.Surface, particle: Dict[str, float]) -> None:
+    """Draw a particle and its trail on the screen."""
+    pygame.draw.circle(screen, particle["color"], (int(particle["x"]), int(particle["y"])), int(particle["radius"]))
+    for i in range(1, len(particle["trail"])):
+        pygame.draw.aaline(screen, particle["color"], particle["trail"][i - 1], particle["trail"][i])
 
-black_hole = {
-    'x': WINDOW_SIZE[0] / 3,
-    'y': WINDOW_SIZE[1] / 2,
-    'vx': random.uniform(-300, 300),
-    'vy': random.uniform(-300, 300),
-    'ax': 0,
-    'ay': 0,
-    'radius':black_hole_radius
-}
-black_hole_2 = {
-    'x': WINDOW_SIZE[0] / 2,
-    'y': WINDOW_SIZE[1] / 3,
-    'vx': random.uniform(-300, 300),
-    'vy': random.uniform(-300, 300),
-    'ax': 0,
-    'ay': 0,
-    'radius':black_hole_radius
-}
-
-# Add the black hole
-# Add the black holes
-black_holes.append(black_hole)
-black_holes.append(black_hole_2)
-
-black_hole_x, black_hole_y = WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2
-
-
-# Add 100 particles to the list
-for i in range(particle_amount):
-     pradius = random.uniform(2, 8)
-     m_i = random.uniform(2*10**8, 4*10**15)
-     particles.append([random.randint(0, 1800), random.randint(0, 1000), random.randint(-10, 10), random.randint(-10, 10), m_i, pradius])
-
-# Create a list to store the position of each particle at each time step
-positions = []
-for i in range(len(particles)):
-    positions.append([])
-
-
-
-
-# Load the image
-background_image = pygame.image.load("bg2.png")
-
-# Scale the image to fit the screen
-background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
-
-
-
-# Main loop to update the screen
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            positions = []
-            for i in range(len(particles)):
-                positions.append([])
-                
-        elif event.type == pygame.MOUSEMOTION:
-            # Update the black hole position based on the mouse position
-            black_hole_x = event.pos[0]
-            black_hole_y = event.pos[1]
-    pygame.draw.circle(screen, (255,234,180), (black_hole_x, black_hole_y), 20) 
-        
-            
+def main() -> None:
+    """Main function to run the simulation."""
+    # Set SDL to use the dummy audio driver, which doesn't require a sound card
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
     
-    # Clear the screen
-    screen.fill((0, 0, 0))
-    screen.blit(background_image, (0, 0))
+    # Initialize Pygame
+    pygame.init()
     
-       
-    pygame.draw.circle(screen, (255,234,180), (black_hole_x, black_hole_y), black_hole_radius)
-    # Draw both black holes
-    for bh in black_holes:
-        pygame.draw.circle(screen, (255,234,180), (int(bh['x']), int(bh['y'])), bh['radius'])
-    
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    clock = pygame.time.Clock()
+    particles = initialize_particles()
+    black_hole_x, black_hole_y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+    running = True
 
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-    # Draw the particles representing the stars
-    for i, particle_i in enumerate(particles):
-        particle_color = colors[i]
-        pygame.draw.circle(screen, particle_color, (int(particle_i[0]), int(particle_i[1])), int(particle_i[5]))
-        # Calculate the acceleration of particle i due to other particles
-        ax = 0
-        ay = 0
-        for j, particle_j in enumerate(particles):
-            if i != j:
-                dx = particle_j[0] - particle_i[0]
-                dy = particle_j[1] - particle_i[1]
-                r = math.sqrt(dx**2 + dy**2)
-                #inertial mass
-                m_i= particle_i[4]
-                a = G * m_i / r**2
-                m_i= particle_i[4]* (1 - ((2 * c**2) / (abs(a) * Theta)))
-                ax += ((2 * G * m_i * c**2) / Theta)**1/4
-                ay += ((2 * G * m_i * c**2) / Theta)**1/4
-        
-        # Add the effect of the black holes on particle i
-        for bh in black_holes:
-            dx = bh['x'] - particle_i[0]
-            dy = bh['y'] - particle_i[1]
-            r = math.sqrt(dx**2 + dy**2)
-            a = G * black_hole_mass / r**2
-            ax += a * dx / r
-            ay += a * dy / r
+        screen.fill((0, 0, 0))
+        pygame.draw.circle(screen, (255, 255, 255), (black_hole_x, black_hole_y), BLACK_HOLE_RADIUS)
 
+        for particle in particles:
+            update_particle(particle, black_hole_x, black_hole_y)
+            draw_particle(screen, particle)
 
-        # Update the velocity of particle i based on the acceleration
-        particle_i[2] += ax / scalefactor
-        particle_i[3] += ay / scalefactor
+        pygame.display.flip()
+        clock.tick(60)  # Limit to 60 frames per second
 
-        # Update the position of particle i based on the velocity
-        particle_i[0] += particle_i[2] / scalefactor
-        particle_i[1] += particle_i[3] / scalefactor
-        
-        # Add the current position to the list for this particle
-        positions[i].append((int(particle_i[0]), int(particle_i[1])))
+    pygame.quit()
 
-        # Draw the particle's trajectory
-        dash_length = 1
-        gap_length = 1
-        for j in range(1, len(positions[i])):
-            if j % (dash_length + gap_length) < dash_length:
-                pygame.draw.aaline(screen, (particle_color), positions[i][j-1], positions[i][j])
-        
-            
-            
-    # If the particle has collided with the black hole, remove it and its trajectory
-
-        
-    # Add the current position to the list for this particle
-        particle_trajectory = []
-        particle_trajectory.append((int(particle_i[0]), int(particle_i[1])))
-        for i in range(len(particle_trajectory)):
-            if i > 0:
-                pygame.draw.line(screen, (particle_color[i]), particle_trajectory[i - 1], particle_trajectory[i], 1)
-                pygame.draw.circle(screen, particle_color, (int(particle_i[0]), int(particle_i[1])), int(particle_i[5]))
-
-        # Calculate the acceleration of particle i due to the black hole
-        dx = black_hole_x - particle_i[0]
-        dy = black_hole_y - particle_i[1]
-        r = math.sqrt(dx**2 + dy**2)
-        a = G * black_hole_mass / r**2
-        black_hole_mass= black_hole_mass* (1 - ((2 * c**2) / (abs(a) * Theta)))
-        ax += a * dx / r
-        ay += a * dy / r
-
-        # Update the velocity of particle i based on the acceleration
-        particle_i[2] += ax + (((2 * G * black_hole_mass * c**2) / Theta)**1/4) / 50
-        particle_i[3] += ay + (((2 * G * black_hole_mass * c**2) / Theta)**1/4) / 50
-
-        # Update the position of particle i based on the velocity
-        particle_i[0] += particle_i[2] / scalefactor
-        particle_i[1] += particle_i[3] / scalefactor
-        
-        # Check if particle is outside the window
-        if particle_i[0] < -30 or particle_i[0] > WINDOW_SIZE[0]+30:
-            particle_i[2] = - 2
-        if particle_i[1] < -30 or particle_i[1] > WINDOW_SIZE[1]+30:
-            particle_i[3] =  - 2
-        
-    
-
-            
-        # Check if particle is inside the black hole
-
-        # Update black hole position
-
-    
-    # choose a radius for the black hole
-    #pygame.draw.circle(screen, (5, 5, 5), (int(black_hole_x), int(black_hole_y)), int(black_hole_radius), 0)
-    #pygame.draw.circle(screen, (255, 255, 255), (int(black_hole_x), int(black_hole_y)), int(black_hole_radius), 2)       
-
-            
-        
-
-
-    # Update the screen
-    pygame.display.flip()
-
-# Quit Pygame
-pygame.quit()
-
+if __name__ == "__main__":
+    main()
